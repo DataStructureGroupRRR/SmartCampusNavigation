@@ -4,7 +4,10 @@ project(SmartCampusNavigation)
 set(EXECUTABLE_NAME ${PROJECT_NAME})
 
 set(SOURCE_FILES
+    "src/Building.cpp"
+    "src/Connections.cpp"
     "src/main.cpp"
+    "src/StringUtil.cpp"
 )
 
 add_executable(${EXECUTABLE_NAME} ${SOURCE_FILES})
