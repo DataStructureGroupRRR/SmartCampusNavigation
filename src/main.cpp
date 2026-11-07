@@ -88,6 +88,7 @@ int main() {
     readFacilities(fFile, buildings, facilities);
     fFile.close();
 
+    // Prints the menu and handles user input until the user chooses to exit
     while (choice != 18) {
         cout << "1.\tView all facilities\n";
         cout << "2.\tSearch facility by ID\n";
@@ -120,14 +121,21 @@ int main() {
                 break;
             }
             case 3: {
+                graph.DisplayGraph();
                 break;
             }
             case 4: {
+                graph.DisplayCountsAndDegrees();
                 break;
             }
             case 5: {
+                string start;
+                if (readName("Enter stating building: ", start)){
+                    graph.DisplayReachableBuildings(start);
+                }
                 break;
             }
+
             case 6: {
                 break;
             }
