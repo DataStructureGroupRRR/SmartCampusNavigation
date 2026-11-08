@@ -5,9 +5,10 @@
 #include <sstream>
 
 #include "Building.h"
-#include "Connections.h"
 #include "Facility.h"
 #include "StringUtil.h"
+#include "CampusGraph.h"
+
 
 using namespace std;
 using namespace scn;
@@ -54,39 +55,35 @@ void readFacilities(ifstream& file, const vector<Building>& buildings, vector<Fa
     }
 }
 
-int main() {
+int main(int argc, char* argv[]) {
+    const string dataDir = argc > 1 ? argv[1] : "data";
     int choice = 0;
-    
-    ifstream bFile("data/buildings.txt");
-    if (!bFile.is_open()) {
-        cout << "Could not read contents of data/buildings.txt!" << endl;
-        return 1;
-    }
+    CampusGraph graph;
 
-    ifstream cFile("data/connections.txt");
-    if (!cFile.is_open()) {
-        cout << "Could not read contents of data/connections.txt!" << endl;
-        return 1;
-    }
+    LoadCounts buildingCounts = graph.LoadFromFile(dataDir);
+    cout << "buildings.txt: " << buildingCounts.accepted << " accepted, "
+         << buildingCounts.rejected << " rejected" << endl;
 
-    ifstream fFile("data/facilities.txt");
-    if (!fFile.is_open()) {
-        cout << "Could not read contents of data/facilities.txt!" << endl;
-        return 1;
-    }
+    LoadCounts connectionCounts = graph.LoadConnections(dataDir);
+    cout << "connections.txt: " << connectionCounts.accepted << " accepted, "
+         << connectionCounts.rejected << " rejected" << endl;
 
+    // Share the graph's accepted building names with the facility loader.
+    // Its existing lookup helper expects this separate vector to be sorted.
     vector<Building> buildings;
-    Connections connections;
+    for (int i = 0; i < graph.BuildingCount(); ++i) {
+        const string& name = graph.BuildingName(i);
+        int position = findPlaceBuilding(buildings, name);
+        buildings.insert(buildings.begin() + position, Building(name));
+    }
+
     vector<Facility> facilities;
-    
-    readBuildings(bFile, buildings);
-    bFile.close();
-
-    connections.ReadConnections(cFile, buildings);
-    cFile.close();
-
-    readFacilities(fFile, buildings, facilities);
-    fFile.close();
+    ifstream fFile(dataDir + "/facilities.txt");
+    if (!fFile.is_open()) {
+        cerr << "Error: Could not open file " << dataDir << "/facilities.txt" << endl;
+    } else {
+        readFacilities(fFile, buildings, facilities);
+    }
 
     // Prints the menu and handles user input until the user chooses to exit
     while (choice != 18) {
@@ -121,7 +118,7 @@ int main() {
                 break;
             }
             case 3: {
-                graph.DisplayGraph();
+                graph.Display();
                 break;
             }
             case 4: {
@@ -130,8 +127,9 @@ int main() {
             }
             case 5: {
                 string start;
-                if (readName("Enter stating building: ", start)){
-                    graph.DisplayReachableBuildings(start);
+                cout << "Enter starting building: ";
+                if (getline(cin >> ws, start)) {
+                    graph.DisplayReachable(start);
                 }
                 break;
             }

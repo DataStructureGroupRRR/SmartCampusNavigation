@@ -1,4 +1,5 @@
 #include "StringUtil.h"
+#include <algorithm>
 
 using namespace std;
 
@@ -41,7 +42,7 @@ string scn::ToLowerAscii(const string& s) {
     string result = s;
     for (size_t i = 0; i < result.length(); ++i) {
         if (result[i] >= 'A' && result[i] <= 'Z') {
-            result[i] += static_cast<char>(out[i] - 'A' + 'a');
+            result[i] = static_cast<char>(result[i] - 'A' + 'a');
         }
     }
     return result;
@@ -52,7 +53,7 @@ string scn::ToUpperAscii(const string& s) {
     string result = s;
     for (size_t i = 0; i < result.length(); ++i) {
         if (result[i] >= 'a' && result[i] <= 'z') {
-            result[i] -= static_cast<char>(result[i] - 'a' + 'A');
+            result[i] = static_cast<char>(result[i] - 'a' + 'A');
         }
     }
     return result;

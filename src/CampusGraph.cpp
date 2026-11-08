@@ -63,8 +63,8 @@ bool CampusGraph::AddConnection(const std::string& building1, const std::string&
         }
     }
 
-    adjacencyList[index1].push_back(index2);
-    adjacencyList[index2].push_back(index1);
+    connections[index1].push_back(index2);
+    connections[index2].push_back(index1);
     ++connectionCount;
     return true;
 
@@ -75,7 +75,7 @@ LoadCounts CampusGraph::LoadFromFile(const std::string& dir) {
     const string filename = "buildings.txt";
     LoadCounts counts = {0, 0};
 
-    ifstream file(dir + "/" + filename).c_str());
+    ifstream file(dir + "/" + filename);
 
     if (!file.is_open()) {
         cerr << "Error: Could not open file " << dir + "/" + filename << endl;
@@ -92,24 +92,31 @@ LoadCounts CampusGraph::LoadFromFile(const std::string& dir) {
         
         string trimmed = Trim(line);
         string reason;
+        bool accepted = false;
 
         if (trimmed.find('|') != string::npos) {
-            reason = "wrong field count (expected 1 field, found 2)";
-        } else if (AddBuilding(trimmed, reason)) {
+            reason = "wrong field count (expected 1 field)";
+        } else {
+            accepted = AddBuilding(trimmed, reason);
+        }
+
+        if (accepted) {
             ++counts.accepted;
         } else {
             ++counts.rejected;
-            cerr << "Error in " << filename << " line " << lineNum << ": " << reason << endl;
+            cerr << "Warning: " << filename << " line " << lineNum
+                 << ": " << reason << endl;
         }
-        return counts;
     }
+    return counts;
+}
 
 // Loads connections.txt from the given directory
 LoadCounts CampusGraph::LoadConnections(const std::string& dir) {
     const string filename = "connections.txt";
     LoadCounts counts = {0, 0};
 
-    ifstream file(dir + "/" + filename).c_str()); 
+    ifstream file(dir + "/" + filename);
 
     if (!file.is_open()) {
         cerr << "Error: Could not open file " << dir + "/" + filename << endl;
@@ -126,14 +133,21 @@ LoadCounts CampusGraph::LoadConnections(const std::string& dir) {
         
         vector<string> fields = SplitFields(line, '|');
         string reason;
+        bool accepted = false;
 
         if (fields.size() != 2) {
             reason = "wrong field count (expected 2 fields, found " + to_string(fields.size()) + ")";
-        } else if (AddConnection(fields[0], fields[1], reason)) {
+        } else if(Trim(fields[0]).empty() || Trim(fields[1]).empty()) {
+            reason = "empty building name";
+        } else {
+            accepted = AddConnection(fields[0], fields[1], reason);
+        }
+
+        if (accepted) {
             ++counts.accepted;
         } else {
             ++counts.rejected;
-            cerr << "Error in " << filename << " line " << lineNum << ": " << reason << endl;
+            cerr << "Warning: " << filename << " line " << lineNum << ": " << reason << endl;
         }
     }
     return counts;
@@ -157,29 +171,29 @@ string CampusGraph::CanonicalName(const std::string& building) const {
     return index == -1 ? "" : buildings[index];
 }
 
-int campusGraph::BuildingCount() const {
+int CampusGraph::BuildingCount() const {
     return static_cast<int>(buildings.size());
 }
 
-int campusGraph::ConnectionCount() const {
+int CampusGraph::ConnectionCount() const {
     return connectionCount;
 }
 
 //Degree = number of distinct neighbours
-int campusGraph::Degree(int index) const {
+int CampusGraph::Degree(int index) const {
     return static_cast<int>(connections[index].size());
 }
 
-const string& campusGraph::BuildingName(int index) const {
+const string& CampusGraph::BuildingName(int index) const {
     return buildings[index];
 }
 
-const vector<int>& campusGraph::Connections(int index) const {
+const vector<int>& CampusGraph::Connections(int index) const {
     return connections[index];
 }
 
 // Prints every building with its neighbours in insertion order
-void campusGraph::DisplayGraph() const{
+void CampusGraph::Display() const{
     if (buildings.empty()) {
         cout << "No buildings in the graph." << endl;
         return;
@@ -190,7 +204,7 @@ void campusGraph::DisplayGraph() const{
         cout << "Building: " << buildings[i] << endl;
         cout << "Connected to: ";
         if (connections[i].empty()) {
-            cout << "None";
+            cout << "(no connections)";
         } else {
             for (size_t j = 0; j < connections[i].size(); ++j) {
                 if (j > 0) {
@@ -204,7 +218,7 @@ void campusGraph::DisplayGraph() const{
 }
 
 // Prints total and each building's degree
-void campusGraph::DisplayCountsAndDegrees() const {
+void CampusGraph::DisplayCountsAndDegrees() const {
     cout << "Total buildings: " << BuildingCount() << endl;
     cout << "Total connections: " << ConnectionCount() << endl;
     if (buildings.empty()) {
@@ -220,7 +234,7 @@ void campusGraph::DisplayCountsAndDegrees() const {
 
 // Breadth-first seach using a queue and a visited array
 // A building is marked visisted when it is added to the queue
-void CampusGraph::Bfs(int startIndex, vector<BfsVisit>& visits) const {
+void CampusGraph::Bfs(int startIndex, vector<BFSResultEntry>& visits) const {
     visits.clear();
     if (startIndex < 0 || startIndex >= BuildingCount()) {
         return;
@@ -237,7 +251,7 @@ void CampusGraph::Bfs(int startIndex, vector<BfsVisit>& visits) const {
         int current = q.front();
         q.pop();
        
-        BfsVisit v;
+        BFSResultEntry v;
         v.building = buildings[current];
         v.distance = distance[current];
         visits.push_back(v);
@@ -256,18 +270,26 @@ void CampusGraph::Bfs(int startIndex, vector<BfsVisit>& visits) const {
 
 // Runs BFS from a typed building name and prints the results. 
 void CampusGraph::DisplayReachable(const std::string& startName) const {
+
+    if (Trim(startName).empty()) {
+        cout << "Error: Building name cannot be empty." << endl;
+        return;
+    }
+
     int startIndex = FindBuilding(startName);
     if (startIndex == -1) {
         cout << "Error: Building \"" << Trim(startName) << "\" not found." << endl;
         return;
     }
 
-    vector<BfsVisit> visits;
+    vector<BFSResultEntry> visits;
     Bfs(startIndex, visits);
 
     cout << "Reachable buildings from \"" << buildings[startIndex] << "\":" << endl;
     for (const auto& visit : visits) {
         cout << visit.building << " (distance: " << visit.distance << ")" << endl;
     }
+
+    cout << "Reachable: " << visits.size() << " of " << BuildingCount() << " buildings." << endl;
 }
 
