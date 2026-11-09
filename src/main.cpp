@@ -3,11 +3,14 @@
 #include <string>
 #include <vector>
 #include <sstream>
+#include <limits>  
 
 #include "Building.h"
 #include "Facility.h"
 #include "StringUtil.h"
-#include "CampusGraph.h"
+#include "CampusGraph.h"           
+#include "DepartmentTree.h"   
+#include "DepartmentMenu.h"   
 
 
 using namespace std;
@@ -85,6 +88,10 @@ int main(int argc, char* argv[]) {
         readFacilities(fFile, buildings, facilities);
     }
 
+    // Member C: load departments.txt (4th file, after facilities); it prints its own warnings and summary.
+    DepartmentTree departments;
+    departments.LoadFromFile(dataDir);
+
     // Prints the menu and handles user input until the user chooses to exit
     while (choice != 18) {
         cout << "1.\tView all facilities\n";
@@ -135,15 +142,25 @@ int main(int argc, char* argv[]) {
             }
 
             case 6: {
+                // Add department
+                cin.ignore(numeric_limits<streamsize>::max(), '\n'); // drop the Enter left by "cin >> choice"
+                HandleAddDepartment(departments);
                 break;
             }
             case 7: {
+                // Search department
+                cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                HandleSearchDepartment(departments);
                 break;
             }
             case 8: {
+                // Display department hierarchy
+                HandleDisplayHierarchy(departments);
                 break;
             }
             case 9: {
+                // Preorder traversal
+                HandlePreorderTraversal(departments);
                 break;
             }
             case 10: {
