@@ -23,7 +23,7 @@ Layout:
   src/ and include/ : C++ implementations and headers
   data/            : unchanged instructor starter data
   testdata/        : separate graph validation and empty fixtures
-  test_results.txt : actual graph/menu test output (partial team test suite)
+  test_results.txt : actual graph/menu test output 
   design_document.txt : current graph/BFS design notes
 
 Manual graph test:
