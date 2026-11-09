@@ -1,0 +1,93 @@
+﻿Smart Campus Navigation - Milestone 1 Design
+Roshan Magar - Campus graph, BFS and shared menu integration
+
+Graph representation
+I used an adjacency list because each campus building only needs a list of
+its neighbors. Building names are stored in a vector, and a vector of neighbor
+indices is stored for each building. Both grow with the input, so there is no
+fixed building limit. Display, degree counts and BFS all use this same graph.
+Buildings stay in file order, and neighbors stay in accepted connection order.
+
+Loading and matching
+The loaders read one complete line at a time, skip blank lines and comments,
+and trim whitespace around fields. Names match without regard to ASCII case,
+but spaces inside a name still matter. The first accepted spelling is kept.
+Invalid records produce a warning with the filename, line number and reason.
+
+A connection must have two known, different endpoints. Duplicate connections,
+including reversed duplicates, are rejected. Each accepted connection adds a
+neighbor to both buildings, but increases the connection count only once.
+A building's degree is the number of neighbors in its list.
+
+BFS reachability
+BFS uses a queue, a visited vector and a distance vector. The start is marked
+visited when it enters the queue and has distance zero. Each new neighbor is
+also marked when enqueued, with a distance one greater than its parent.
+Processing neighbors in stored order keeps the visit sequence predictable.
+The output includes the start and reports how many buildings were reached
+out of the total. An isolated start reaches only itself. Unknown or blank
+starts show an error and return to the menu.
+
+With adjacency lists, BFS takes O(V + E) time and O(V) extra space, where V is
+the number of buildings and E is the number of connections. Building lookup
+uses a scan of the name vector; duplicate-edge checks scan the neighbor list.
+
+Shared helpers and menu
+StringUtil handles trimming, ASCII case comparison, splitting fields and
+recognizing blank/comment lines. main.cpp loads the graph, prints its load
+summaries and calls graph actions through M1 options 3, 4 and 5.
+Menu input is read as a full line, so blank input, letters, out-of-range
+numbers and trailing text can be rejected without breaking the next prompt.
+Building prompts accept spaces, and end-of-input exits cleanly.
+
+===========================================================
+
+Name: Rainier Velasco 
+
+Tree design
+  The department hierarchy is a GENERAL tree: each node keeps a std::vector of
+  child pointers, so a node can have any number of children and no fixed limit
+  exists anywhere (no fixed-size arrays). Children stay in insertion order, so
+  siblings are always visited in the order they were accepted.
+
+Classes and modules
+  DepartmentNode (DepartmentNode.h/.cpp)
+    One department: name (spelling from the first accepted record), parent
+    pointer, and the vector of children. Provides child count, leaf test and
+    depth (edges from the root, root depth 0). A node never deletes anything.
+  DepartmentTree (DepartmentTree.h/.cpp)
+    Owns every node. Loads departments.txt, adds and searches departments,
+    prints the indented hierarchy and returns the preorder sequence. The
+    destructor deletes all nodes; copying is disabled so ownership is never
+    shared by accident.
+  DepartmentMenu (DepartmentMenu.h/.cpp)
+    The four menu handlers (add, search, hierarchy, preorder). All prompting
+    and messages for departments live here, which keeps main.cpp small.
+  DepartmentUtil (DepartmentUtil.h/.cpp)
+    Trim (spaces, tabs, \r), ASCII case-insensitive compare and field
+    splitting. Kept in its own namespace (deptutil) so it does not depend on
+    or change the shared string utilities.
+
+Loading rules
+  Blank lines and lines whose first non-space character is # are skipped.
+  A record must have exactly two fields; both are trimmed and must be nonempty.
+  The first valid record must have parent NONE (any capitalization) and becomes
+  the root; NONE on any later record is rejected. A later record needs a parent
+  accepted on an earlier line (matched ignoring case) and a name that is not
+  already used (ignoring case); the first accepted spelling is kept. Every
+  rejection prints: filename, line number, reason. After the file a load
+  summary prints accepted and rejected counts. A missing file prints an error,
+  is treated as empty, and the program continues.
+
+Searching and traversal
+  Search is a case-insensitive scan over the list of nodes (the spec requires
+  a hash table only for facility IDs). Preorder uses an explicit stack instead
+  of recursion, so a very deep hierarchy cannot overflow the call stack:
+  the root is visited, then children are pushed in reverse so the first child
+  is processed first. The indented display and the plain preorder sequence
+  both use the same traversal; display indents four spaces per depth level.
+
+Why a vector of children
+  It is simple, keeps insertion order for free, and allows any number of
+  children.
+

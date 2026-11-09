@@ -1,0 +1,9 @@
+# Building names stay in this order.
+  Alpha Hall  
+Beta Hall
+Island
+Second Island
+Room #5
+alpha hall
+Bad|Building
+
