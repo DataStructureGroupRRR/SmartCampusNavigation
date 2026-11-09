@@ -121,6 +121,53 @@ int main(int argc, char* argv[]) {
             case 0:
                 cout << "Thank you for using our navigation service! Goodbye." << endl;
                 return 0;
+	    
+case 1: {
+    if (facilities.empty()) {
+        cout << "No facilities available." << endl;
+        break;
+    }
+
+    cout << "All Facilities:" << endl;
+
+    for (const Facility& facility : facilities) {
+        cout << "ID: " << facility.GetId() << endl;
+        cout << "Name: " << facility.GetName() << endl;
+        cout << "Building: " << facility.GetBuildingName() << endl;
+        cout << "Category: " << facility.GetCategory() << endl;
+        cout << "------------------------" << endl;
+    }
+    break;
+}
+
+case 2: {
+    string searchId;
+    cout << "Enter facility ID: ";
+    if (!getline(cin, searchId)) {
+        cout << "\nInput ended. Goodbye." << endl;
+        return 0;
+    }
+
+    bool found = false;
+
+    for (const Facility& facility : facilities) {
+        if (facility.GetId() == searchId) {
+            cout << "Facility found:" << endl;
+            cout << "ID: " << facility.GetId() << endl;
+            cout << "Name: " << facility.GetName() << endl;
+            cout << "Building: " << facility.GetBuildingName() << endl;
+            cout << "Category: " << facility.GetCategory() << endl;
+            found = true;
+            break;
+        }
+    }
+
+    if (!found) {
+        cout << "Facility not found." << endl;
+    }
+    break;
+}
+
             case 3:
                 graph.Display();
                 break;
@@ -130,6 +177,7 @@ int main(int argc, char* argv[]) {
             case 5: {
                 string start;
                 cout << "Enter starting building: " << flush;
+
                 if (!getline(cin, start)) {
                     cout << "\nInput ended. Goodbye." << endl;
                     return 0;
