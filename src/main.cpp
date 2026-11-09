@@ -3,14 +3,13 @@
 #include <string>
 #include <vector>
 #include <sstream>
-#include <limits>  
 
 #include "Building.h"
 #include "Facility.h"
 #include "StringUtil.h"
-#include "CampusGraph.h"           
-#include "DepartmentTree.h"   
-#include "DepartmentMenu.h"   
+#include "CampusGraph.h"
+#include "DepartmentTree.h"
+#include "DepartmentMenu.h"
 
 
 using namespace std;
@@ -88,114 +87,73 @@ int main(int argc, char* argv[]) {
         readFacilities(fFile, buildings, facilities);
     }
 
-    // Member C: load departments.txt (4th file, after facilities); it prints its own warnings and summary.
+    // Load departments after facilities; the loader prints its summary.
     DepartmentTree departments;
     departments.LoadFromFile(dataDir);
 
-    // Prints the menu and handles user input until the user chooses to exit
-    while (choice != 18) {
-        cout << "1.\tView all facilities\n";
-        cout << "2.\tSearch facility by ID\n";
-        cout << "3.\tSearch facility by name\n";
-        cout << "4.\tSearch facility by category\n";
-        cout << "5.\tView campus graph\n";
-        cout << "6.\tDisplay graph counts and degrees\n";
-        cout << "7.\tFind reachable buildings (BFS)\n";
-        cout << "8.\tFind shortest path (BFS)\n";
-        cout << "9.\tAdd department\n";
-        cout << "10.\tSearch department\n";
-        cout << "11.\tDisplay department hierarchy\n";
-        cout << "12.\tPreorder traversal\n";
-        cout << "13.\tPostorder traversal\n";
-        cout << "14.\tLevel-order traversal\n";
-        cout << "15.\tDepartment statistics\n";
-        cout << "16.\tFacility category report\n";
-        cout << "17.\tGraph connectivity report\n";
-        cout << "18.\tExit\n\n" << flush;
+    // Read complete lines so invalid input and blank names recover cleanly.
+    while (true) {
+        cout << "1.\tView all facilities\n"
+             << "2.\tSearch facility by ID\n"
+             << "3.\tView campus graph\n"
+             << "4.\tDisplay graph counts and degrees\n"
+             << "5.\tFind reachable buildings (BFS)\n"
+             << "6.\tAdd department\n"
+             << "7.\tSearch department\n"
+             << "8.\tDisplay department hierarchy\n"
+             << "9.\tRun preorder traversal\n"
+             << "0.\tExit\n\n"
+             << "Select an action: " << flush;
 
-        cout << "Select an action: ";
-        cin >> choice;
-        cout << endl;
+        string line;
+        if (!getline(cin, line)) {
+            cout << "\nInput ended. Goodbye." << endl;
+            break;
+        }
+        istringstream input(line);
+        string extra;
+        if (!(input >> choice) || (input >> extra) || choice < 0 || choice > 9) {
+            cout << "Error: Please enter a whole number between 0 and 9.\n\n";
+            continue;
+        }
 
         switch (choice) {
-            case 1: {
-                break;
-            }
-            case 2: {
-                break;
-            }
-            case 3: {
+            case 0:
+                cout << "Thank you for using our navigation service! Goodbye." << endl;
+                return 0;
+            case 3:
                 graph.Display();
                 break;
-            }
-            case 4: {
+            case 4:
                 graph.DisplayCountsAndDegrees();
                 break;
-            }
             case 5: {
                 string start;
-                cout << "Enter starting building: ";
-                if (getline(cin >> ws, start)) {
-                    graph.DisplayReachable(start);
+                cout << "Enter starting building: " << flush;
+                if (!getline(cin, start)) {
+                    cout << "\nInput ended. Goodbye." << endl;
+                    return 0;
                 }
+                graph.DisplayReachable(start);
                 break;
             }
-
-            case 6: {
-                // Add department
-                cin.ignore(numeric_limits<streamsize>::max(), '\n'); // drop the Enter left by "cin >> choice"
+            case 6:
                 HandleAddDepartment(departments);
                 break;
-            }
-            case 7: {
-                // Search department
-                cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            case 7:
                 HandleSearchDepartment(departments);
                 break;
-            }
-            case 8: {
-                // Display department hierarchy
+            case 8:
                 HandleDisplayHierarchy(departments);
                 break;
-            }
-            case 9: {
-                // Preorder traversal
+            case 9:
                 HandlePreorderTraversal(departments);
                 break;
-            }
-            case 10: {
-                break;
-            }
-            case 11: {
-                break;
-            }
-            case 12: {
-                break;
-            }
-            case 13: {
-                break;
-            }
-            case 14: {
-                break;
-            }
-            case 15: {
-                break;
-            }
-            case 16: {
-                break;
-            }
-            case 17: {
-                break;
-            }
-            case 18: {
-                cout << "Thank you for using our navigation service! Goodbye." << endl;
-                break;
-            }
             default:
-                cout << "Please enter a number between 1 and 18.\n\n" << flush;
+                // Facility owners will integrate options 1 and 2.
+                cout << "This feature is awaiting module integration." << endl;
                 break;
         }
     }
-
     return 0;
 }

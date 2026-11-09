@@ -1,0 +1,41 @@
+﻿Smart Campus Navigation - Milestone 1 Design
+Roshan Magar - Campus graph, BFS and shared menu integration
+
+Graph representation
+I used an adjacency list because each campus building only needs a list of
+its neighbors. Building names are stored in a vector, and a vector of neighbor
+indices is stored for each building. Both grow with the input, so there is no
+fixed building limit. Display, degree counts and BFS all use this same graph.
+Buildings stay in file order, and neighbors stay in accepted connection order.
+
+Loading and matching
+The loaders read one complete line at a time, skip blank lines and comments,
+and trim whitespace around fields. Names match without regard to ASCII case,
+but spaces inside a name still matter. The first accepted spelling is kept.
+Invalid records produce a warning with the filename, line number and reason.
+
+A connection must have two known, different endpoints. Duplicate connections,
+including reversed duplicates, are rejected. Each accepted connection adds a
+neighbor to both buildings, but increases the connection count only once.
+A building's degree is the number of neighbors in its list.
+
+BFS reachability
+BFS uses a queue, a visited vector and a distance vector. The start is marked
+visited when it enters the queue and has distance zero. Each new neighbor is
+also marked when enqueued, with a distance one greater than its parent.
+Processing neighbors in stored order keeps the visit sequence predictable.
+The output includes the start and reports how many buildings were reached
+out of the total. An isolated start reaches only itself. Unknown or blank
+starts show an error and return to the menu.
+
+With adjacency lists, BFS takes O(V + E) time and O(V) extra space, where V is
+the number of buildings and E is the number of connections. Building lookup
+uses a scan of the name vector; duplicate-edge checks scan the neighbor list.
+
+Shared helpers and menu
+StringUtil handles trimming, ASCII case comparison, splitting fields and
+recognizing blank/comment lines. main.cpp loads the graph, prints its load
+summaries and calls graph actions through M1 options 3, 4 and 5.
+Menu input is read as a full line, so blank input, letters, out-of-range
+numbers and trailing text can be rejected without breaking the next prompt.
+Building prompts accept spaces, and end-of-input exits cleanly.

@@ -1,0 +1,28 @@
+﻿Smart Campus Navigation - Milestone 1 Contributions
+
+Name: Roshan Magar
+GitHub/commit account: RoshanMagar17
+My part: Campus graph and BFS reachability (Member B)
+
+I built CampusGraph using adjacency lists that grow with the input. I added
+loading and validation for buildings.txt and connections.txt, including
+case-insensitive name matching, whitespace trimming, duplicate buildings,
+duplicate and reversed edges, unknown endpoints and self-connections.
+The graph keeps the original building spelling and input order. It displays
+neighbors, building and connection totals, and each building's degree.
+
+I implemented BFS with a queue and a visited list. Buildings are marked when
+they enter the queue. The output shows visit order, distance from the start
+and the reachable count, including isolated buildings and unknown-start errors.
+
+For shared work, I connected the graph to main.cpp, added its load summaries,
+updated the M1 menu numbering and improved input recovery. I also worked on
+the build setup and corrected connection storage.
+
+I added separate graph test data and recorded ten graph/menu tests in
+test_results.txt. I wrote the graph/BFS design notes and the build, run and
+manual testing instructions. All ten tests passed locally on Windows;
+CELL verification is still outstanding.
+
+This file describes my work only. The other members still need to add their
+names, modules and shared work before the team submits it.

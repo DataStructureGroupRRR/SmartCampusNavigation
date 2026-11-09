@@ -10,6 +10,10 @@ set(SOURCE_FILES
     "src/main.cpp"
     "src/StringUtil.cpp"
     "src/CampusGraph.cpp"
+    "src/DepartmentNode.cpp"
+    "src/DepartmentTree.cpp"
+    "src/DepartmentUtil.cpp"
+    "src/DepartmentMenu.cpp"
 )
 
 add_executable(${EXECUTABLE_NAME} ${SOURCE_FILES})

@@ -1,0 +1,236 @@
+Milestone 1 - Graph/BFS and Shared Menu Test Results
+Contributor: Roshan Magar
+Scope: Graph/BFS and shared menu input only. Recreated from current local Windows execution; CMake build passed. CELL has not been verified.
+Run from project root with the indicated data-directory argument. Enter quoted inputs one per line. "" is a blank line; <EOF> ends input. Repeated menus are omitted below.
+The missing-directory test intentionally uses a nonexistent path.
+
+Test 1: [M1] Sample graph display, counts and degrees (10.1)
+Data directory: data
+Input: "3", "4", "0", <EOF>
+Expected result: 7 buildings, 6 edges; insertion order preserved, Observatory has no connections. Degrees: Library 2, Student Union 3, Science Building 2, Engineering Building 1, Business Building 2, Gym 2, Observatory 0.
+Actual result (exit code 0):
+buildings.txt: 7 accepted, 0 rejected
+connections.txt: 6 accepted, 0 rejected
+Select an action: Campus Graph:
+Building: Library
+Connected to: Student Union, Business Building
+Building: Student Union
+Connected to: Library, Science Building, Gym
+Building: Science Building
+Connected to: Student Union, Engineering Building
+Building: Engineering Building
+Connected to: Science Building
+Building: Business Building
+Connected to: Library, Gym
+Building: Gym
+Connected to: Student Union, Business Building
+Building: Observatory
+Connected to: (no connections)
+Select an action: Total buildings: 7
+Total connections: 6
+Building degrees:
+Library: 2
+Student Union: 3
+Science Building: 2
+Engineering Building: 1
+Business Building: 2
+Gym: 2
+Observatory: 0
+Select an action: Thank you for using our navigation service! Goodbye.
+Result: PASS
+
+Test 2: [M1] Connected BFS with case/whitespace matching (10.3)
+Data directory: data
+Input: "5", "  lIbRaRy  ", "0", <EOF>
+Expected result: Library 0, Student Union 1, Business Building 1, Science Building 2, Gym 2, Engineering Building 3; reachable 6 of 7.
+Actual result (exit code 0):
+buildings.txt: 7 accepted, 0 rejected
+connections.txt: 6 accepted, 0 rejected
+Select an action: Enter starting building: Reachable buildings from "Library":
+Library (distance: 0)
+Student Union (distance: 1)
+Business Building (distance: 1)
+Science Building (distance: 2)
+Gym (distance: 2)
+Engineering Building (distance: 3)
+Reachable: 6 of 7 buildings.
+Select an action: Thank you for using our navigation service! Goodbye.
+Result: PASS
+
+Test 3: [M1] Isolated BFS (10.3)
+Data directory: data
+Input: "5", "Observatory", "0", <EOF>
+Expected result: Only Observatory at distance 0; reachable 1 of 7.
+Actual result (exit code 0):
+buildings.txt: 7 accepted, 0 rejected
+connections.txt: 6 accepted, 0 rejected
+Select an action: Enter starting building: Reachable buildings from "Observatory":
+Observatory (distance: 0)
+Reachable: 1 of 7 buildings.
+Select an action: Thank you for using our navigation service! Goodbye.
+Result: PASS
+
+Test 4: [M1] Unknown start, blank name and recovery (10.3/10.4)
+Data directory: data
+Input: "5", "Unknown", "5", "", "5", "Student  Union", "4", "0", <EOF>
+Expected result: Unknown-name, blank-name and internal-space mismatch errors, then valid statistics.
+Actual result (exit code 0):
+buildings.txt: 7 accepted, 0 rejected
+connections.txt: 6 accepted, 0 rejected
+Select an action: Enter starting building: Error: Building "Unknown" not found.
+Select an action: Enter starting building: Error: Building name cannot be empty.
+Select an action: Enter starting building: Error: Building "Student  Union" not found.
+Select an action: Total buildings: 7
+Total connections: 6
+Building degrees:
+Library: 2
+Student Union: 3
+Science Building: 2
+Engineering Building: 1
+Business Building: 2
+Gym: 2
+Observatory: 0
+Select an action: Thank you for using our navigation service! Goodbye.
+Result: PASS
+
+Test 5: [M1] Invalid numeric menu input and recovery (10.4)
+Data directory: data
+Input: "", "abc", "-1", "10", "3junk", "3.5", "999999999999999999999", "4", "0", <EOF>
+Expected result: Seven errors, then graph counts and clean exit.
+Actual result (exit code 0):
+buildings.txt: 7 accepted, 0 rejected
+connections.txt: 6 accepted, 0 rejected
+Select an action: Error: Please enter a whole number between 0 and 9.
+Select an action: Error: Please enter a whole number between 0 and 9.
+Select an action: Error: Please enter a whole number between 0 and 9.
+Select an action: Error: Please enter a whole number between 0 and 9.
+Select an action: Error: Please enter a whole number between 0 and 9.
+Select an action: Error: Please enter a whole number between 0 and 9.
+Select an action: Error: Please enter a whole number between 0 and 9.
+Select an action: Total buildings: 7
+Total connections: 6
+Building degrees:
+Library: 2
+Student Union: 3
+Science Building: 2
+Engineering Building: 1
+Business Building: 2
+Gym: 2
+Observatory: 0
+Select an action: Thank you for using our navigation service! Goodbye.
+Result: PASS
+
+Test 6: [M1] Missing files and menu EOF (10.1)
+Data directory: testdata/graph-missing
+Input: "3", "4", "5", "Library", <EOF>
+Expected result: Named missing-file errors; zero graph summaries/totals, empty display, unknown BFS start; clean EOF exit.
+Actual result (exit code 0):
+buildings.txt: 0 accepted, 0 rejected
+connections.txt: 0 accepted, 0 rejected
+Error: Could not open file testdata/graph-missing/buildings.txt
+Error: Could not open file testdata/graph-missing/connections.txt
+Error: Could not open file testdata/graph-missing/facilities.txt
+Select an action: No buildings in the graph.
+Select an action: Total buildings: 0
+Total connections: 0
+No buildings in the graph.
+Select an action: Enter starting building: Error: Building "Library" not found.
+Select an action: 
+Input ended. Goodbye.
+Result: PASS
+
+Test 7: BFS prompt EOF
+Data directory: data
+Input: "5", <EOF>
+Expected result: Clean exit when building input ends.
+Actual result (exit code 0):
+buildings.txt: 7 accepted, 0 rejected
+connections.txt: 6 accepted, 0 rejected
+Select an action: Enter starting building: 
+Input ended. Goodbye.
+Result: PASS
+
+Test 8: [M1] Valid building name containing spaces (10.4)
+Data directory: data
+Input: "5", "Student Union", "0", <EOF>
+Expected result: Student Union accepted at distance 0; reachable 6 of 7.
+Actual result (exit code 0):
+buildings.txt: 7 accepted, 0 rejected
+connections.txt: 6 accepted, 0 rejected
+Select an action: Enter starting building: Reachable buildings from "Student Union":
+Student Union (distance: 0)
+Library (distance: 1)
+Science Building (distance: 1)
+Gym (distance: 1)
+Business Building (distance: 2)
+Engineering Building (distance: 2)
+Reachable: 6 of 7 buildings.
+Select an action: Thank you for using our navigation service! Goodbye.
+Result: PASS
+
+Test 9: [M1] Additional graph validation and separate components
+Data directory: testdata/graph-validation
+File input: all four files in the data directory above. Blank and comment lines are included in the validation files.
+Input: "3", "4", "5", "Island", "5", "alpha hall", "0", <EOF>
+Expected result: 5 accepted and 2 rejected buildings; 3 accepted and 7 rejected connections. Reject duplicate buildings, duplicate/reversed edges, unknown endpoints, self-connections and bad fields. Island reaches 2 of 5; Alpha Hall reaches 3 of 5.
+Actual result (exit code 0):
+buildings.txt: 5 accepted, 2 rejected
+connections.txt: 3 accepted, 7 rejected
+Select an action: Campus Graph:
+Building: Alpha Hall
+Connected to: Beta Hall
+Building: Beta Hall
+Connected to: Alpha Hall, Room #5
+Building: Island
+Connected to: Second Island
+Building: Second Island
+Connected to: Island
+Building: Room #5
+Connected to: Beta Hall
+Select an action: Total buildings: 5
+Total connections: 3
+Building degrees:
+Alpha Hall: 1
+Beta Hall: 2
+Island: 1
+Second Island: 1
+Room #5: 1
+Select an action: Enter starting building: Reachable buildings from "Island":
+Island (distance: 0)
+Second Island (distance: 1)
+Reachable: 2 of 5 buildings.
+Warning: buildings.txt line 7: duplicate building "alpha hall" (matches "Alpha Hall")
+Warning: buildings.txt line 8: wrong field count (expected 1 field)
+Warning: connections.txt line 5: duplicate connection from "Beta Hall" to "Alpha Hall"
+Warning: connections.txt line 6: duplicate connection from "Alpha Hall" to "Beta Hall"
+Warning: connections.txt line 7: unknown building "Unknown"
+Warning: connections.txt line 8: connection from "Alpha Hall" to itself
+Warning: connections.txt line 9: wrong field count (expected 2 fields, found 1)
+Warning: connections.txt line 10: wrong field count (expected 2 fields, found 3)
+Warning: connections.txt line 11: empty building name
+Select an action: Enter starting building: Reachable buildings from "Alpha Hall":
+Alpha Hall (distance: 0)
+Beta Hall (distance: 1)
+Room #5 (distance: 2)
+Reachable: 3 of 5 buildings.
+Select an action: Thank you for using our navigation service! Goodbye.
+Result: PASS
+
+Test 10: Empty graph
+Data directory: testdata/graph-empty
+File input: all four files in the data directory above. Blank and comment lines are included in the validation files.
+Input: "3", "4", "5", "Library", "0", <EOF>
+Expected result: Zero graph records, clear empty-graph display, zero counts and an unknown-start error.
+Actual result (exit code 0):
+buildings.txt: 0 accepted, 0 rejected
+connections.txt: 0 accepted, 0 rejected
+Select an action: No buildings in the graph.
+Select an action: Total buildings: 0
+Total connections: 0
+No buildings in the graph.
+Select an action: Enter starting building: Error: Building "Library" not found.
+Select an action: Thank you for using our navigation service! Goodbye.
+Result: PASS
+
+Coverage: Tests 1 and 9 cover graph loading in Section 10.1. Tests 2-4 and 9 cover BFS in Section 10.3. Tests 4, 5 and 8 cover shared menu/name handling in Section 10.4. Tests 7 and 10 add EOF/empty-graph checks.
+These results cover my graph/BFS and shared menu work. The team still needs facility/hash-table and department tests. CELL has not been tested.

@@ -1,0 +1,12 @@
+  # Two separate groups of connected buildings.
+ Alpha Hall | beta hall 
+Island|Second Island
+Beta Hall|Room #5
+Beta Hall|Alpha Hall
+Alpha Hall|Beta Hall
+Alpha Hall|Unknown
+Alpha Hall|Alpha Hall
+Alpha Hall
+Alpha Hall|Beta Hall|Island
+Alpha Hall|
+
