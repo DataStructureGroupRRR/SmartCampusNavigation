@@ -38,3 +38,7 @@ search department, indented hierarchy display, preorder traversal.
 
 Shared work: README, overall menu, test_results.txt, documentation review.
 
+Rodrigo Martinez
+Member A
+
+File loading and facility organization
