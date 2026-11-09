@@ -5,11 +5,15 @@ set(EXECUTABLE_NAME ${PROJECT_NAME})
 
 set(SOURCE_FILES
     "src/Building.cpp"
-    "src/Facility.cpp"
+    "src/CampusGraph.cpp"
     "src/Connections.cpp"
+    "src/DepartmentMenu.cpp"
+    "src/DepartmentNode.cpp"
+    "src/DepartmentTree.cpp"
+    "src/DepartmentUtil.cpp"
+    "src/Facility.cpp"
     "src/main.cpp"
     "src/StringUtil.cpp"
-    "src/CampusGraph.cpp"
 )
 
 add_executable(${EXECUTABLE_NAME} ${SOURCE_FILES})
