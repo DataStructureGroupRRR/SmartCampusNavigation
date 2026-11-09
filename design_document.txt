@@ -39,3 +39,55 @@ summaries and calls graph actions through M1 options 3, 4 and 5.
 Menu input is read as a full line, so blank input, letters, out-of-range
 numbers and trailing text can be rejected without breaking the next prompt.
 Building prompts accept spaces, and end-of-input exits cleanly.
+
+===========================================================
+
+Name: Rainier Velasco 
+
+Tree design
+  The department hierarchy is a GENERAL tree: each node keeps a std::vector of
+  child pointers, so a node can have any number of children and no fixed limit
+  exists anywhere (no fixed-size arrays). Children stay in insertion order, so
+  siblings are always visited in the order they were accepted.
+
+Classes and modules
+  DepartmentNode (DepartmentNode.h/.cpp)
+    One department: name (spelling from the first accepted record), parent
+    pointer, and the vector of children. Provides child count, leaf test and
+    depth (edges from the root, root depth 0). A node never deletes anything.
+  DepartmentTree (DepartmentTree.h/.cpp)
+    Owns every node. Loads departments.txt, adds and searches departments,
+    prints the indented hierarchy and returns the preorder sequence. The
+    destructor deletes all nodes; copying is disabled so ownership is never
+    shared by accident.
+  DepartmentMenu (DepartmentMenu.h/.cpp)
+    The four menu handlers (add, search, hierarchy, preorder). All prompting
+    and messages for departments live here, which keeps main.cpp small.
+  DepartmentUtil (DepartmentUtil.h/.cpp)
+    Trim (spaces, tabs, \r), ASCII case-insensitive compare and field
+    splitting. Kept in its own namespace (deptutil) so it does not depend on
+    or change the shared string utilities.
+
+Loading rules
+  Blank lines and lines whose first non-space character is # are skipped.
+  A record must have exactly two fields; both are trimmed and must be nonempty.
+  The first valid record must have parent NONE (any capitalization) and becomes
+  the root; NONE on any later record is rejected. A later record needs a parent
+  accepted on an earlier line (matched ignoring case) and a name that is not
+  already used (ignoring case); the first accepted spelling is kept. Every
+  rejection prints: filename, line number, reason. After the file a load
+  summary prints accepted and rejected counts. A missing file prints an error,
+  is treated as empty, and the program continues.
+
+Searching and traversal
+  Search is a case-insensitive scan over the list of nodes (the spec requires
+  a hash table only for facility IDs). Preorder uses an explicit stack instead
+  of recursion, so a very deep hierarchy cannot overflow the call stack:
+  the root is visited, then children are pushed in reverse so the first child
+  is processed first. The indented display and the plain preorder sequence
+  both use the same traversal; display indents four spaces per depth level.
+
+Why a vector of children
+  It is simple, keeps insertion order for free, and allows any number of
+  children.
+

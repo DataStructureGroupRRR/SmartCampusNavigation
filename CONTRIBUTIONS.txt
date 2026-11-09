@@ -24,3 +24,22 @@ test_results.txt. I wrote the graph/BFS design notes and the build, run and
 manual testing instructions. 
 
 
+This file describes my work only. The other members still need to add their
+names, modules and shared work before the team submits it.
+
+Rainier Velasco
+
+Modules:
+  - DepartmentNode (include/DepartmentNode.h, src/DepartmentNode.cpp)
+  - DepartmentTree (include/DepartmentTree.h, src/DepartmentTree.cpp)
+  - DepartmentMenu (include/DepartmentMenu.h, src/DepartmentMenu.cpp)
+  - DepartmentUtil (include/DepartmentUtil.h, src/DepartmentUtil.cpp)
+  - departments.txt loading and validation, load summary for departments.txt
+  - Department test data (testdata/dept_*), standalone test driver (tests/department_driver.cpp)
+  - Department section of design_document.txt and test_results.txt
+
+Features: general tree, load from departments.txt, add department,
+search department, indented hierarchy display, preorder traversal.
+
+Shared work: README, overall menu, test_results.txt, documentation review.
+
