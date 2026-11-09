@@ -234,3 +234,198 @@ Result: PASS
 
 Coverage: Tests 1 and 9 cover graph loading in Section 10.1. Tests 2-4 and 9 cover BFS in Section 10.3. Tests 4, 5 and 8 cover shared menu/name handling in Section 10.4. Tests 7 and 10 add EOF/empty-graph checks.
 These results cover my graph/BFS and shared menu work. The team still needs facility/hash-table and department tests. CELL has not been tested.
+
+Name: Rainier Velasco 
+================================================================
+Tested with: g++ -std=c++11 -Wall -Wextra -pedantic (0 warnings), using
+tests/department_driver.cpp (the M1 menu, options 6-9 and 0 only).
+Build: g++ -std=c++11 -Wall -Wextra -pedantic -Iinclude src/Department*.cpp tests/department_driver.cpp -o dept_driver
+Run:   ./dept_driver <data-directory>      (menu input is typed or piped)
+results below are from a Linux g++ build.
+
+Test lines are tagged [M1] (required now) or [Final] (a Final-phase item, done early).
+Line numbers refer to the lines of the test file.
+
+FILE LOADING
+
+C-01 Sample departments.txt loads
+  Input:    ./dept_driver testdata/dept_sample, then menu 8
+  Expected: "departments.txt: 7 accepted, 0 rejected"; hierarchy University > 2 colleges > 2 departments each
+  Actual:   7 accepted, 0 rejected; hierarchy matches the spec Example 7 (4-space indent per depth)
+  Result:   PASS
+
+C-02 [M1] Blank lines, comment lines, too few and too many fields
+  Input:    testdata/dept_malformed (blank line 3, "   # indented comment" line 4,
+            line 6 has 3 fields, line 7 has 1 field)
+  Expected: lines 3 and 4 silently skipped; lines 6 and 7 rejected with filename, line number, reason
+  Actual:   "WARNING: departments.txt line 6: expected 2 fields ... but found 3"
+            "WARNING: departments.txt line 7: expected 2 fields ... but found 1"
+            Lines 3 and 4 produced no output.
+  Result:   PASS
+
+C-03 [M1] Missing file
+  Input:    ./dept_driver testdata/no_such_dir
+  Expected: error naming the file, treated as empty, no crash, menu still works
+  Actual:   "ERROR: Could not open testdata/no_such_dir/departments.txt; treating departments.txt as empty."
+            "departments.txt: 0 accepted, 0 rejected"; menu appeared and exit worked
+  Result:   PASS
+
+C-04 [M1] Unknown department parent
+  Input:    testdata/dept_malformed line 10 "Chemistry|College of Medicine"; line 13 "Library Science|Library Science"
+  Expected: both rejected naming the unknown parent (a parent must be accepted on an EARLIER line, so self-parent is unknown)
+  Actual:   line 10: "unknown parent department 'College of Medicine'"
+            line 13: "unknown parent department 'Library Science'"
+  Result:   PASS
+
+C-05 [Final] Duplicate department names differing only by capitalization
+  Input:    testdata/dept_malformed line 11 "COLLEGE OF ENGINEERING|University", line 14 "UNIVERSITY|University"
+  Expected: rejected; the first accepted spelling is kept
+  Actual:   line 11: "duplicate department name 'COLLEGE OF ENGINEERING' (already exists as 'College of Engineering')"
+            line 14: duplicate of 'University'. Hierarchy still shows "College of Engineering" and "University".
+  Result:   PASS
+
+C-06 [Final] Empty required fields
+  Input:    testdata/dept_malformed line 8 "|University", line 9 "Physics|"
+  Expected: both rejected
+  Actual:   line 8: "department name is empty"; line 9: "parent name is empty"
+  Result:   PASS
+
+C-07 [M1] Load totals for the malformed file
+  Input:    testdata/dept_malformed (15 data records)
+  Expected: 4 accepted (University, College of Engineering, Math Dept, Electrical Engineering), 9 rejected
+  Actual:   "departments.txt: 4 accepted, 9 rejected"; tree has exactly those four departments
+  Result:   PASS
+
+C-08 [M1] Only the root may use NONE
+  Input:    testdata/dept_malformed line 12 "Statistics|NONE" (root already exists)
+  Expected: rejected
+  Actual:   "only the root department may have parent NONE"
+  Result:   PASS
+
+C-09 [M1] First record that is not a valid root
+  Input:    testdata/dept_badroot ("Biology|Science" first, then "Science|NONE", then "Biology|Science")
+  Expected: first record rejected (root must have NONE); "Science" becomes the root; Biology then accepted under it
+  Actual:   line 2 rejected: "the first department (root) must have parent NONE, found 'Science'";
+            "2 accepted, 1 rejected"; hierarchy Science > Biology
+  Result:   PASS
+
+C-10 [Final] Empty file
+  Input:    testdata/dept_empty (0 bytes)
+  Expected: "0 accepted, 0 rejected", no crash
+  Actual:   "departments.txt: 0 accepted, 0 rejected"
+  Result:   PASS
+
+C-11 [Final] Windows line endings, extra whitespace, lowercase "none", '#' inside a name
+  Input:    testdata/dept_crlf (CRLF endings, tabs/spaces around fields, "  University | none ", "Room #5 Studies")
+  Expected: 3 accepted, 0 rejected; names clean (no \r); "Room #5 Studies" is a normal name, not a comment
+  Actual:   "3 accepted, 0 rejected"; search "  ROOM #5 studies " finds "Room #5 Studies" (parent College of Engineering, depth 2);
+            output contained 0 carriage-return characters
+  Result:   PASS
+
+TREE OPERATIONS
+
+C-12 [M1] Empty tree: add root without a parent prompt
+  Input:    testdata/dept_empty; menu 6; name "Computer Systems"
+  Expected: no parent prompt; becomes root
+  Actual:   only "Enter new department name:" was asked; "Department 'Computer Systems' added as the root of the hierarchy."
+  Result:   PASS
+
+C-13 [M1] Empty tree messages (hierarchy, preorder, search)
+  Input:    testdata/dept_empty; menu 8, 9, then 7 with name "Anything"
+  Expected: clear empty-state message each time, no crash
+  Actual:   "No departments are loaded." for all three
+  Result:   PASS
+
+C-14 [M1] Root-only tree
+  Input:    testdata/dept_rootonly; menu 9, then 7 "UNIVERSITY"
+  Expected: preorder shows 1 department; search shows root details
+  Actual:   "1. University"; Name University, Parent None, Direct children 0, Depth 0
+  Result:   PASS
+
+C-15 [M1] Search: root, non-root, missing, case-insensitive, outer whitespace
+  Input:    testdata/dept_sample; menu 7 with "University", "  computer science  ", "Physics", "Chemistry"
+  Expected: found details (parent None for root; correct children and depth); "Chemistry" not found
+  Actual:   University: Parent None, children 2, depth 0
+            Computer Science: Parent College of Engineering, children 0, depth 2
+            Physics: Parent College of Science, children 0, depth 2
+            Chemistry: "Department 'Chemistry' was not found."
+  Result:   PASS
+
+C-16 [M1] Add with an unknown parent
+  Input:    testdata/dept_sample; menu 6; name "Biology"; parent "No Such College"
+  Expected: error naming the problem; tree unchanged
+  Actual:   "Error: unknown parent department 'No Such College'. Tree unchanged."; later hierarchy had no Biology
+  Result:   PASS
+
+C-17 [M1] Add a duplicate name (capitalization differs)
+  Input:    testdata/dept_sample; menu 6; name "physics"
+  Expected: error naming the duplicate; tree unchanged; no parent prompt needed
+  Actual:   "Error: duplicate department name 'physics' (already exists as 'Physics'). Tree unchanged."
+  Result:   PASS
+
+C-18 [M1] Add a valid department; parent matched ignoring case
+  Input:    testdata/dept_sample; menu 6; name "Chemistry"; parent "college of science"; then menu 8, 9, 7 "CHEMISTRY"
+  Expected: added as the LAST child of College of Science; shown in hierarchy and preorder; searchable
+  Actual:   "Department 'Chemistry' added under 'College of Science'."; hierarchy and preorder show it after Physics (insertion order);
+            search: Parent College of Science, children 0, depth 2
+  Result:   PASS
+
+C-19 [M1] Internal spaces matter
+  Input:    testdata/dept_empty after adding root "Computer Systems"; menu 6, child "Child One", parent "computer   systems" (3 spaces)
+  Expected: rejected (internal spaces are not collapsed); then the same add with the correct parent succeeds
+  Actual:   "Error: unknown parent department 'computer   systems'. Tree unchanged."; retry with "computer systems" accepted
+  Result:   PASS
+
+C-20 [M1] Indented hierarchy display
+  Input:    testdata/dept_sample; menu 8
+  Expected: one department per line, four spaces per depth level, preorder
+  Actual:   University / 4 spaces College of Engineering / 8 spaces Computer Science ... (matches spec Example 7)
+  Result:   PASS
+
+C-21 [M1] Preorder traversal (no indentation)
+  Input:    testdata/dept_sample (after adding Chemistry); menu 9
+  Expected: University, College of Engineering, Computer Science, Electrical Engineering, College of Science, Mathematics, Physics, Chemistry
+  Actual:   same order, numbered 1-8, no indentation
+  Result:   PASS
+
+C-22 [M1] General tree: many children and a deeper branch
+  Input:    testdata/dept_wide; menu 9, then 7 "college a"
+  Expected: root with 7 children; siblings in insertion order; preorder visits a whole subtree before the next sibling
+  Actual:   "12 accepted"; preorder University, College A, Dept A1, Lab A1a, Dept A2, Dept A3, College B ... College G;
+            College A: Parent University, children 3, depth 1
+  Result:   PASS
+
+MENU AND INPUT
+
+C-23 [M1] Invalid menu input
+  Input:    blank line, "abc", "99", "-1", "6x", "   " (spaces only), then "0"
+  Expected: an error for each, no crash, no endless loop, menu keeps working
+  Actual:   "Invalid choice. Please enter a number from 0 to 9." each time; "0" then exited with "Goodbye."
+  Result:   PASS
+
+C-24 [M1] Names with spaces; blank names
+  Input:    add "Child  Two" (two internal spaces); blank name at add; blank name at search; blank parent at add
+  Expected: spaced names accepted exactly as typed; blank names rejected with an error and a return to the menu
+  Actual:   "Child  Two" stored with both spaces; "Error: department name cannot be blank." (add and search);
+            "Error: parent department name cannot be blank."; menu returned each time
+  Result:   PASS
+
+C-25 [M1] Repeated operations after errors
+  Input:    in one session: unknown-parent add, duplicate add, blank add, valid add, hierarchy, preorder, search
+  Expected: every operation after an error still works
+  Actual:   all later operations worked normally (see C-16, C-17, C-18)
+  Result:   PASS
+
+C-26 [M1] Input ends without choosing Exit
+  Input:    stdin closed after "8"
+  Expected: program ends cleanly, no infinite loop
+  Actual:   "End of input. Exiting." with exit code 0
+  Result:   PASS
+
+MEMORY
+
+C-27 [Final] Valgrind (--leak-check=full)
+  Input:    sample data + add + search + exit; malformed data; missing file
+  Expected: no leaks, no errors
+  Actual:   "All heap blocks were freed -- no leaks are possible"; ERROR SUMMARY: 0 errors (all three runs)
+  Result:   PASS
