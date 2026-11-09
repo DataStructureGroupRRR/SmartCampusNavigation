@@ -21,8 +21,6 @@ the build setup and corrected connection storage.
 
 I added separate graph test data and recorded ten graph/menu tests in
 test_results.txt. I wrote the graph/BFS design notes and the build, run and
-manual testing instructions. All ten tests passed locally on Windows;
-CELL verification is still outstanding.
+manual testing instructions. 
 
-This file describes my work only. The other members still need to add their
-names, modules and shared work before the team submits it.
+
