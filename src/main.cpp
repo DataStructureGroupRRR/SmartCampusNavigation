@@ -95,14 +95,22 @@ int main(int argc, char* argv[]) {
     while (true) {
         cout << "1.\tView all facilities\n"
              << "2.\tSearch facility by ID\n"
-             << "3.\tView campus graph\n"
-             << "4.\tDisplay graph counts and degrees\n"
-             << "5.\tFind reachable buildings (BFS)\n"
-             << "6.\tAdd department\n"
-             << "7.\tSearch department\n"
-             << "8.\tDisplay department hierarchy\n"
-             << "9.\tRun preorder traversal\n"
-             << "0.\tExit\n\n"
+             << "3.\tSearch facility by name\n"
+             << "4.\tSearch facility by category\n"
+             << "5.\tView campus graph\n"
+             << "6.\tDisplay graph counts and degrees\n"
+             << "7.\tFind reachable buildings (BFS)\n"
+             << "8.\tFind shortest path (BFS)\n"
+             << "9.\tAdd department\n"
+             << "10.\tSearch department\n"
+             << "11.\tDisplay department hierarchy\n"
+             << "12.\tRun preorder traversal\n"
+             << "13.\tRun postorder traversal\n"
+             << "14.\tRun level-order traversal\n"
+             << "15.\tDepartment statistics\n"
+             << "16.\tFacility category report\n"
+             << "17.\tGraph connectivity report\n"
+             << "18.\tExit\n\n"
              << "Select an action: " << flush;
 
         string line;
@@ -112,69 +120,70 @@ int main(int argc, char* argv[]) {
         }
         istringstream input(line);
         string extra;
-        if (!(input >> choice) || (input >> extra) || choice < 0 || choice > 9) {
-            cout << "Error: Please enter a whole number between 0 and 9.\n\n";
+        if (!(input >> choice) || (input >> extra) || choice < 1 || choice > 18) {
+            cout << "Error: Please enter a whole number between 1 and 18.\n\n";
             continue;
         }
 
         switch (choice) {
-            case 0:
-                cout << "Thank you for using our navigation service! Goodbye." << endl;
-                return 0;
-	    
-case 1: {
-    if (facilities.empty()) {
-        cout << "No facilities available." << endl;
-        break;
-    }
+            case 1: {
+                if (facilities.empty()) {
+                    cout << "No facilities available." << endl;
+                    break;
+                }
 
-    cout << "All Facilities:" << endl;
+                cout << "All Facilities:" << endl;
 
-    for (const Facility& facility : facilities) {
-        cout << "ID: " << facility.GetId() << endl;
-        cout << "Name: " << facility.GetName() << endl;
-        cout << "Building: " << facility.GetBuildingName() << endl;
-        cout << "Category: " << facility.GetCategory() << endl;
-        cout << "------------------------" << endl;
-    }
-    break;
-}
+                for (const Facility& facility : facilities) {
+                    cout << "ID: " << facility.GetId() << endl;
+                    cout << "Name: " << facility.GetName() << endl;
+                    cout << "Building: " << facility.GetBuildingName() << endl;
+                    cout << "Category: " << facility.GetCategory() << endl;
+                    cout << "------------------------" << endl;
+                }
+                break;
+            }
 
-case 2: {
-    string searchId;
-    cout << "Enter facility ID: ";
-    if (!getline(cin, searchId)) {
-        cout << "\nInput ended. Goodbye." << endl;
-        return 0;
-    }
+            case 2: {
+                string searchId;
+                cout << "Enter facility ID: ";
+                if (!getline(cin, searchId)) {
+                    cout << "\nInput ended. Goodbye." << endl;
+                    return 0;
+                }
 
-    bool found = false;
+                bool found = false;
 
-    for (const Facility& facility : facilities) {
-        if (facility.GetId() == searchId) {
-            cout << "Facility found:" << endl;
-            cout << "ID: " << facility.GetId() << endl;
-            cout << "Name: " << facility.GetName() << endl;
-            cout << "Building: " << facility.GetBuildingName() << endl;
-            cout << "Category: " << facility.GetCategory() << endl;
-            found = true;
-            break;
-        }
-    }
+                for (const Facility& facility : facilities) {
+                    if (facility.GetId() == searchId) {
+                        cout << "Facility found:" << endl;
+                        cout << "ID: " << facility.GetId() << endl;
+                        cout << "Name: " << facility.GetName() << endl;
+                        cout << "Building: " << facility.GetBuildingName() << endl;
+                        cout << "Category: " << facility.GetCategory() << endl;
+                        found = true;
+                        break;
+                    }
+                }
 
-    if (!found) {
-        cout << "Facility not found." << endl;
-    }
-    break;
-}
+                if (!found) {
+                    cout << "Facility not found." << endl;
+                }
+                break;
+            }
 
             case 3:
-                graph.Display();
                 break;
             case 4:
+                break;
+
+            case 5:
+                graph.Display();
+                break;
+            case 6:
                 graph.DisplayCountsAndDegrees();
                 break;
-            case 5: {
+            case 7: {
                 string start;
                 cout << "Enter starting building: " << flush;
 
@@ -185,20 +194,35 @@ case 2: {
                 graph.DisplayReachable(start);
                 break;
             }
-            case 6:
-                HandleAddDepartment(departments);
-                break;
-            case 7:
-                HandleSearchDepartment(departments);
-                break;
             case 8:
-                HandleDisplayHierarchy(departments);
                 break;
             case 9:
+                HandleAddDepartment(departments);
+                break;
+            case 10:
+                HandleSearchDepartment(departments);
+                break;
+            case 11:
+                HandleDisplayHierarchy(departments);
+                break;
+            case 12:
                 HandlePreorderTraversal(departments);
                 break;
+            case 13:
+                break;
+            case 14:
+                break;
+            case 15:
+                break;
+            case 16:
+                break;
+            case 17:
+                break;
+            case 18:
+                cout << "Thank you for using our navigation service! Goodbye." << endl;
+                return 0;
             default:
-                // Facility owners will integrate options 1 and 2.
+                // Failsafe
                 cout << "This feature is awaiting module integration." << endl;
                 break;
         }
